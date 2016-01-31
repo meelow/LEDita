@@ -1,5 +1,6 @@
 #include "FastLED.h"
 #include <Bridge.h>
+#include <Console.h>
 
 FASTLED_USING_NAMESPACE
 
@@ -34,6 +35,7 @@ void setup() {
   SetupChristmasPalette();
   
   Bridge.begin();
+  Console.begin();
 }
 
 
