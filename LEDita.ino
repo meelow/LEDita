@@ -1,5 +1,6 @@
 #include "FastLED.h"
 #include <Bridge.h>
+#include <Console.h>
 
 FASTLED_USING_NAMESPACE
 
@@ -18,6 +19,23 @@ CRGB leds[NUM_LEDS];
 
 CRGBPalette16 currentPalette;
 
+// List of patterns to cycle through.  Each is defined as a separate function below.
+typedef void (*SimplePatternList[])();
+SimplePatternList gModes = { confetti, rainbow, sinelon, juggle, bpm };
+SimplePatternList gFilters = {filter_glitter, sinelon};
+
+uint8_t gActiveModeNumber = 0; // Index number of which pattern is current
+uint8_t gActiveFilters = 0;
+uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+uint8_t gBrightness=128;
+uint8_t gRotary1=60;
+uint8_t gXYpad1=0;
+uint8_t gXYpad2=0;
+uint8_t gPush1=0;
+uint8_t gPush2=0;
+uint8_t gPush3=0;
+unsigned int gShowEveryNMillis = 16;
+
 void setup() {
   delay(3000); // 3 second delay for recovery
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -32,103 +50,63 @@ void setup() {
   }
   
   SetupChristmasPalette();
-  
+ 
   Bridge.begin();
+  Console.begin();
 }
-
-
-// List of patterns to cycle through.  Each is defined as a separate function below.
-typedef void (*SimplePatternList[])();
-//SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
-//SimplePatternList gPatterns = { sinelon, confetti, barControl };
-SimplePatternList gModes = { confetti, rainbow, sinelon, juggle, bpm };
-//SimplePatternList gPatterns = { barControl, rainbow };
-
-uint8_t gCurrentModeNumber = 0; // Index number of which pattern is current
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
-uint8_t gBrightness=128;
-uint8_t gRotary1=60;
-uint8_t gXYpad1=0;
-uint8_t gXYpad2=0;
-uint8_t gPush1=0;
-uint8_t gPush2=0;
-uint8_t gPush3=0;
-
-
-unsigned int gShowEveryNMillis = 16;
   
 void loop()
 {
   unsigned long currentMillis = millis();
   static unsigned long lastShow=0;
-  static unsigned long lastFilterUpdate=0;
-//  const unsigned int showEveryNMillis = 1000/FRAMES_PER_SECOND;
-  
+  static unsigned long lastFilterUpdate=0;  
   
   if( (currentMillis-lastFilterUpdate) > gRotary1 )
   {
     lastFilterUpdate=currentMillis;
 	gHue++;
   }
-  
-  if(gPush1==255) 
-  {
-    addGlitter(255);
-	Bridge.put("push1","0");
-  }
-  
+    
   if( (currentMillis-lastShow) > gShowEveryNMillis )
   {
       lastShow=currentMillis;	
 	  // Call the current pattern function once, updating the 'leds' array
-	  gModes[gCurrentModeNumber]();
-
-	  FastLED.setBrightness(gBrightness);
-	  
-	  // send the 'leds' array out to the actual LED strip
-	  FastLED.show();  
-	  // insert a delay to keep the framerate modest
-	  // FastLED.delay(1000/FRAMES_PER_SECOND); 
+	  paint();
   }
 
   // do some periodic updates
-//  EVERY_N_MILLISECONDS( 300 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   EVERY_N_MILLISECONDS(50) { updateFromBridge(); }
- // EVERY_N_SECONDS( 240 ) { nextPattern(); } // change patterns periodically
- }
+}
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-void nextMode()
+void paint()
 {
-  // add one to the current Mode number, and wrap around at the end
-  gCurrentModeNumber = (gCurrentModeNumber + 1) % ARRAY_SIZE( gModes);
-}
-void setMode(uint8_t number)
-{
-  gCurrentModeNumber = (number) % ARRAY_SIZE( gModes);
+  // paint the background (aka mode):
+  gModes[gActiveModeNumber]();
   
+  // paint the filters on top of that:
+  if( (gActiveFilters&1) == 1 ) gFilters[0%ARRAY_SIZE( gFilters)]();
+  if( (gActiveFilters&2) == 2 ) gFilters[1%ARRAY_SIZE( gFilters)]();
+  
+  // set general brightness:
+  FastLED.setBrightness(gBrightness);
+  
+  // send the 'leds' array out to the actual LED strip
+  FastLED.show();  
 }
 
 void rainbow() 
 {
   // FastLED's built-in rainbow generator
   fill_rainbow( leds, NUM_LEDS, gHue, 1);
-  // static uint8_t lHue=0;
-  // lHue+=1;
-  // fill_rainbow( leds, NUM_LEDS, lHue, 1);
 }
 
-void rainbowWithGlitter() 
+void filter_glitter() 
 {
-  // built-in FastLED rainbow, plus some random sparkly glitter
-  rainbow();
-  addGlitter(80);
-}
-
-void addGlitter( fract8 chanceOfGlitter) 
-{
-  if( random8() < chanceOfGlitter) {
+  uint8_t chanceOfGlitter=gRotary1;
+  if( random8(120) < chanceOfGlitter) 
+  {
     uint8_t led = random16(NUM_LEDS);
     leds[led-2] += CRGB::White;
     leds[led-1] += CRGB::White;
@@ -223,8 +201,19 @@ void updateFromBridge()
 	int mode = atoi(bridgeValueStr);
 	if( mode>=0 && mode<255 )
 	{
-	  setMode(mode);
+	  gActiveModeNumber = (mode) % ARRAY_SIZE( gModes);
 	} 	
+	
+	// read filters:
+	Bridge.get("filters",bridgeValueStr, stringSize);
+	int filters = atoi(bridgeValueStr);
+	if( filters>=0 && filters<255 )
+	{
+	  gActiveFilters = filters % (2^ARRAY_SIZE( gModes));
+	  Bridge.put("filters", "256");
+      Console.print("filters="); Console.println(filters);
+      Console.print("gActiveFilters="); Console.println(gActiveFilters);
+	} 
 	
 	// read rotary1:
 	Bridge.get("rotary1",bridgeValueStr, stringSize);
