@@ -84,7 +84,7 @@ def multiselectFilters_callback(path, tags, args, source):
 	msg.insert(0, int(args[0]))
 	client.connect( (source[0], 9000) )
 	client.send(msg)
-for x in range(1,4):
+for x in range(1,5):
 	server.addMsgHandler("/1/filters/"+str(x)+"/1", multiselectFilters_callback)
 
 def rotary1_callback(path, tags, args, source):
@@ -97,11 +97,11 @@ def rotary1_callback(path, tags, args, source):
 	client.send(msg)
 server.addMsgHandler("/1/rotary1/", rotary1_callback)
 	
-def xypadSatVal_callback(path, tags, args, source):
+def xypad_callback(path, tags, args, source):
 	print str(path) + " " + str(int(args[0]))+ " " +str(int(args[1]))
 	json.send({'command':'put', 'key':'xypad1', 'value':'%i' % int(args[0])})
 	json.send({'command':'put', 'key':'xypad2', 'value':'%i' % int(args[1])})	
-server.addMsgHandler("/1/xypad/", xypadSatVal_callback)
+server.addMsgHandler("/1/xypad/", xypad_callback)
 
 def accell_callback(path, tags, args, source):
 	print str(path) + " " + str(float(args[0]))+ " " +str(float(args[1])) + " " +str(float(args[2]))
