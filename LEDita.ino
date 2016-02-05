@@ -15,7 +15,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    120
 CRGB leds[NUM_LEDS];
 
-//#define FRAMES_PER_SECOND  60
+#define DEFAULT_FRAMES_PER_SECOND  50
 
 CRGBPalette16 currentPalette;
 
@@ -57,7 +57,7 @@ uint8_t gPush2=0;
 uint8_t gPush3=0;
 
 
-unsigned int gShowEveryNMillis = 16;
+unsigned int gShowEveryNMillis = DEFAULT_FRAMES_PER_SECOND;
   
 void loop()
 {
@@ -217,8 +217,9 @@ void updateFromBridge()
 	// read speed:
 	Bridge.get("fps", bridgeValueStr, stringSize);
 	int fps = atoi(bridgeValueStr);
-	if( fps==0 || fps<0 ) fps=1;
-	gShowEveryNMillis = 1000/fps;
+	if( fps==0 || fps<0 ) 
+	  fps=DEFAULT_FRAMES_PER_SECOND;
+    gShowEveryNMillis = 1000/fps;
 
 	// read mode:
 	Bridge.get("state",bridgeValueStr, stringSize);
