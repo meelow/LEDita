@@ -69,21 +69,21 @@ void loop()
   EVERY_N_MILLISECONDS(100) { updateFromBridge(); }
   
   // Processing
-  //  do computation on the global variables and input values then paint into the buffer
+  //  do computation on the global variables and input values then paint into the buffer 'leds'
   if( (currentMillis-timeOfLastProcessing) > gShowEveryNMillis )  
   { 
     timeOfLastProcessing = currentMillis;  // remember this processing
   	gHue+=1;
-	if( gShowEveryNMillis<10)
-	{
-	  // boost speed a little so that rainbow looks faster:
-	  gHue+=2;
-	}
+	
+	// boost speed a little so that rainbow looks faster:
+	if( gShowEveryNMillis<10) gHue+=2;
+	
+	// fill the 'led' buffer:
     gModes[gCurrentModeNumber]();
   }
   
   // Output
-  //  adapt current brightness and paint 'leds' on the string
+  //  adapt current brightness and paint the buffer 'leds' on the string
   EVERY_N_MILLISECONDS(10) 
   { 
     FastLED.setBrightness(gBrightness);
@@ -93,11 +93,6 @@ void loop()
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-void nextMode()
-{
-  // add one to the current Mode number, and wrap around at the end
-  gCurrentModeNumber = (gCurrentModeNumber + 1) % ARRAY_SIZE( gModes);
-}
 void setMode(uint8_t number)
 {
   gCurrentModeNumber = (number) % ARRAY_SIZE( gModes);
