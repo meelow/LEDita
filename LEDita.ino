@@ -15,7 +15,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    120
 CRGB leds[NUM_LEDS];
 
-#define DEFAULT_FRAMES_PER_SECOND  50
+#define DEFAULT_FRAMES_PER_SECOND  60
 
 CRGBPalette16 currentPalette;
 
@@ -57,46 +57,38 @@ uint8_t gPush2=0;
 uint8_t gPush3=0;
 
 
-unsigned int gShowEveryNMillis = DEFAULT_FRAMES_PER_SECOND;
+unsigned int gShowEveryNMillis = 1000/DEFAULT_FRAMES_PER_SECOND;
   
 void loop()
 {
   unsigned long currentMillis = millis();
-  static unsigned long lastShow=0;
-  static unsigned long lastFilterUpdate=0;
-//  const unsigned int showEveryNMillis = 1000/FRAMES_PER_SECOND;
+  static unsigned long timeOfLastProcessing=0;
   
+  // Input
+  //  read OSC data from bridge and adapt these input values
+  EVERY_N_MILLISECONDS(100) { updateFromBridge(); }
   
-  if( (currentMillis-lastFilterUpdate) > gRotary1 )
-  {
-    lastFilterUpdate=currentMillis;
-	gHue++;
+  // Processing
+  //  do computation on the global variables and input values then paint into the buffer
+  if( (currentMillis-timeOfLastProcessing) > gShowEveryNMillis )  
+  { 
+    timeOfLastProcessing = currentMillis;  // remember this processing
+  	gHue+=1;
+	if( gShowEveryNMillis<10)
+	{
+	  // boost speed a little so that rainbow looks faster:
+	  gHue+=2;
+	}
+    gModes[gCurrentModeNumber]();
   }
   
-  if(gPush1==255) 
-  {
-    addGlitter(255);
-	Bridge.put("push1","0");
+  // Output
+  //  adapt current brightness and paint 'leds' on the string
+  EVERY_N_MILLISECONDS(10) 
+  { 
+    FastLED.setBrightness(gBrightness);
+    FastLED.show();  
   }
-  
-  if( (currentMillis-lastShow) > gShowEveryNMillis )
-  {
-      lastShow=currentMillis;	
-	  // Call the current pattern function once, updating the 'leds' array
-	  gModes[gCurrentModeNumber]();
-
-	  FastLED.setBrightness(gBrightness);
-	  
-	  // send the 'leds' array out to the actual LED strip
-	  FastLED.show();  
-	  // insert a delay to keep the framerate modest
-	  // FastLED.delay(1000/FRAMES_PER_SECOND); 
-  }
-
-  // do some periodic updates
-//  EVERY_N_MILLISECONDS( 300 ) { gHue++; } // slowly cycle the "base color" through the rainbow
-  EVERY_N_MILLISECONDS(50) { updateFromBridge(); }
- // EVERY_N_SECONDS( 240 ) { nextPattern(); } // change patterns periodically
  }
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
