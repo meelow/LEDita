@@ -129,17 +129,54 @@ void addGlitter( fract8 chanceOfGlitter)
 
 void confetti() 
 {
-  // random colored speckles that blink in and fade smoothly
+  const uint8_t cCompartments=20;
+  const uint8_t cCompartmentLength=NUM_LEDS/cCompartments;
+  static uint8_t lFadeInCompartments[cCompartments];
+ 
+  // fade all existing compartments
   fadeToBlackBy( leds, NUM_LEDS, 20);
-  
-  if( random8(100) > 80 )
+ 
+  // increase light in each compartmet until max, then switch off
+  for( uint8_t currentCompartment=0; currentCompartment<cCompartments; currentCompartment++ )
   {
-	  uint16_t pos = random16(NUM_LEDS);
-	  uint8_t col = random16();
-	  leds[(pos-1)%NUM_LEDS] += ColorFromPalette( currentPalette, col-5, 150, LINEARBLEND);
-	  leds[pos]              += ColorFromPalette( currentPalette, col, 200, LINEARBLEND);
-	  leds[(pos+1)%NUM_LEDS] += ColorFromPalette( currentPalette, col+5, 150, LINEARBLEND);
+    if( lFadeInCompartments[currentCompartment] != 0 )
+	  lFadeInCompartments[currentCompartment]+=20;
+    if( lFadeInCompartments[currentCompartment] > 200 )
+	  lFadeInCompartments[currentCompartment] = 0;	  
   }
+  
+  // paint the compartments
+  for( uint8_t currentCompartment=0; currentCompartment<cCompartments; currentCompartment++ )
+  {
+    if( lFadeInCompartments[currentCompartment] != 0 )
+	{
+	  for( uint8_t currentPixel=0; currentPixel<cCompartmentLength; currentPixel++)
+	  {
+	    uint8_t compartmentStartPixel = currentCompartment * cCompartmentLength;
+	    leds[compartmentStartPixel+currentPixel] = CHSV( gHue, 255, lFadeInCompartments[currentCompartment]);
+	  }
+	}
+  }
+
+  // randomly select new compartments to 'grow' in light  
+  if( random8(120) > gRotary1 )
+  {
+	  uint8_t pos = random8(cCompartments);
+	  if( lFadeInCompartments[pos] == 0 )
+	    lFadeInCompartments[pos] = 1;
+  }
+ 
+   
+   
+  // random colored speckles that blink in and fade smoothly  
+  // if( random8(100) > 25 )
+  // {
+	  // uint16_t pos = random16(NUM_LEDS);
+	  // uint8_t col = random16();
+	  // leds[(pos-1)%NUM_LEDS] += ColorFromPalette( currentPalette, col-5, 150, LINEARBLEND);
+	  // leds[pos]              += ColorFromPalette( currentPalette, col, 200, LINEARBLEND);
+	  // leds[(pos+1)%NUM_LEDS] += ColorFromPalette( currentPalette, col+5, 150, LINEARBLEND);
+  // }
 }
 
 void sinelon()
