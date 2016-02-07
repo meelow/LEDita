@@ -43,7 +43,7 @@ void setup() {
 typedef void (*SimplePatternList[])();
 //SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
 //SimplePatternList gPatterns = { sinelon, confetti, barControl };
-SimplePatternList gModes = { confetti, rainbow, sinelon, juggle, bpm };
+SimplePatternList gModes = { confetti, rainbow, bpm, sinelon, juggle };
 //SimplePatternList gPatterns = { barControl, rainbow };
 
 uint8_t gCurrentModeNumber = 0; // Index number of which pattern is current
@@ -129,54 +129,53 @@ void addGlitter( fract8 chanceOfGlitter)
 
 void confetti() 
 {
-  const uint8_t cCompartments=20;
+  // The led strip is divided into a fixed number of compartments containing some LEDs. 
+  // Randomly a compartment starts fading in and out again. Randomness controllable by gRotary1
+  // Color of compartment can be choosen with xyPad1 and xyPad2
+  const uint8_t cCompartments=10;
   const uint8_t cCompartmentLength=NUM_LEDS/cCompartments;
-  static uint8_t lFadeInCompartments[cCompartments];
+  const uint8_t cFadeAmmount=10;
+  static uint8_t lValueOfCompartment[cCompartments];
  
   // fade all existing compartments
-  fadeToBlackBy( leds, NUM_LEDS, 20);
+  fadeToBlackBy( leds, NUM_LEDS, cFadeAmmount);
  
   // increase light in each compartmet until max, then switch off
   for( uint8_t currentCompartment=0; currentCompartment<cCompartments; currentCompartment++ )
   {
-    if( lFadeInCompartments[currentCompartment] != 0 )
-	  lFadeInCompartments[currentCompartment]+=20;
-    if( lFadeInCompartments[currentCompartment] > 200 )
-	  lFadeInCompartments[currentCompartment] = 0;	  
+    if( lValueOfCompartment[currentCompartment] != 0 )
+	  lValueOfCompartment[currentCompartment]+=cFadeAmmount;
+    if( lValueOfCompartment[currentCompartment] > 200 )
+	  lValueOfCompartment[currentCompartment] = 0;	  
   }
   
   // paint the compartments
   for( uint8_t currentCompartment=0; currentCompartment<cCompartments; currentCompartment++ )
   {
-    if( lFadeInCompartments[currentCompartment] != 0 )
+    if( lValueOfCompartment[currentCompartment] != 0 )
 	{
 	  for( uint8_t currentPixel=0; currentPixel<cCompartmentLength; currentPixel++)
 	  {
 	    uint8_t compartmentStartPixel = currentCompartment * cCompartmentLength;
-	    leds[compartmentStartPixel+currentPixel] = CHSV( gHue, 255, lFadeInCompartments[currentCompartment]);
+	    leds[compartmentStartPixel+currentPixel] = CHSV( gXYpad1, gXYpad2, lValueOfCompartment[currentCompartment]);
 	  }
 	}
   }
 
-  // randomly select new compartments to 'grow' in light  
-  if( random8(120) > gRotary1 )
+  // randomly select new compartments to 'grow' in light, but make sure at least 1 compartment is lit
+  bool atLeastOneLit=false;
+  for( uint8_t currentCompartment=0; currentCompartment<cCompartments; currentCompartment++ )
+  {
+    uint8_t compartmentMiddlePixel = (currentCompartment * cCompartmentLength) + cCompartmentLength/2;
+    if( leds[compartmentMiddlePixel] )
+	  atLeastOneLit=true;
+  }	  
+  if( (atLeastOneLit==false) || (random8(120) < gRotary1) )
   {
 	  uint8_t pos = random8(cCompartments);
-	  if( lFadeInCompartments[pos] == 0 )
-	    lFadeInCompartments[pos] = 1;
+	  if( lValueOfCompartment[pos] == 0 )
+	    lValueOfCompartment[pos] = 1;
   }
- 
-   
-   
-  // random colored speckles that blink in and fade smoothly  
-  // if( random8(100) > 25 )
-  // {
-	  // uint16_t pos = random16(NUM_LEDS);
-	  // uint8_t col = random16();
-	  // leds[(pos-1)%NUM_LEDS] += ColorFromPalette( currentPalette, col-5, 150, LINEARBLEND);
-	  // leds[pos]              += ColorFromPalette( currentPalette, col, 200, LINEARBLEND);
-	  // leds[(pos+1)%NUM_LEDS] += ColorFromPalette( currentPalette, col+5, 150, LINEARBLEND);
-  // }
 }
 
 void sinelon()
