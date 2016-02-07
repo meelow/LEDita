@@ -170,11 +170,12 @@ void confetti()
     if( leds[compartmentMiddlePixel] )
 	  atLeastOneLit=true;
   }	  
-  if( (atLeastOneLit==false) || (random8(120) < gRotary1) )
+  if( (atLeastOneLit==false) || (random8(120) < gRotary1) ) // shall we light one compartment?
   {
-	  uint8_t pos = random8(cCompartments);
-	  if( lValueOfCompartment[pos] == 0 )
-	    lValueOfCompartment[pos] = 1;
+	  uint8_t currentCompartment = random8(cCompartments);
+	  uint8_t middlePixelOfCompartment = (currentCompartment*cCompartmentLength)+cCompartmentLength/2;
+	  if( ! leds[middlePixelOfCompartment] ) // make sure the compartment is not lit before
+	    lValueOfCompartment[currentCompartment] = 1;
   }
 }
 
