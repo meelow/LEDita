@@ -181,7 +181,14 @@ void confetti()
 
 void tuneup()
 {
-  
+  for(uint8_t i=0; i<NUM_LEDS; i++)
+  {
+    leds[i] = CRGB(0,0,0);
+  }
+  for( uint8_t i=0; i<(NUM_LEDS/120)*gRotary1; i++ )
+  {
+    leds[i] = CHSV(gXYpad1,gXYpad2,gBrightness);
+  }
 }
 
 void sinelon()
