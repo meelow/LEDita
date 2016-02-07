@@ -43,7 +43,7 @@ void setup() {
 typedef void (*SimplePatternList[])();
 //SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
 //SimplePatternList gPatterns = { sinelon, confetti, barControl };
-SimplePatternList gModes = { confetti, rainbow, bpm, sinelon, juggle };
+SimplePatternList gModes = { confetti, rainbow, bpm, tuneup, sinelon, juggle };
 //SimplePatternList gPatterns = { barControl, rainbow };
 
 uint8_t gCurrentModeNumber = 0; // Index number of which pattern is current
@@ -177,6 +177,11 @@ void confetti()
 	  if( ! leds[middlePixelOfCompartment] ) // make sure the compartment is not lit before
 	    lValueOfCompartment[currentCompartment] = 1;
   }
+}
+
+void tuneup()
+{
+  
 }
 
 void sinelon()
