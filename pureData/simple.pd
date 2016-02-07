@@ -1,23 +1,23 @@
-#N canvas 1143 -438 520 378 10;
+#N canvas 1143 0 520 378 10;
 #X obj 8 272 sendOSC;
 #X msg 263 122 send /1/brightness \$1;
 #X obj 266 85 hsl 128 30 0 255 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 6300 0;
+-1 -1 9200 0;
 #X obj 59 273 print;
 #X msg 36 35 disconnect;
 #X obj 264 14 hsl 128 30 0 255 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 12700 0;
 #X obj 262 168 hradio 30 1 0 7 empty empty empty 0 -8 0 30 -262144
--1 -1 1;
-#X msg 262 201 send /1/AnimationMode/\$1/1 1;
-#X msg 8 16 connect 192.168.1.199 8000;
+-1 -1 2;
 #X msg 261 51 send /1/fps \$1;
+#X msg 8 16 connect 192.168.1.107 8000;
+#X msg 262 201 send /1/state/\$1/1 1;
 #X connect 1 0 3 0;
 #X connect 1 0 0 0;
 #X connect 2 0 1 0;
 #X connect 4 0 0 0;
-#X connect 5 0 9 0;
-#X connect 6 0 7 0;
+#X connect 5 0 7 0;
+#X connect 6 0 9 0;
 #X connect 7 0 0 0;
 #X connect 7 0 3 0;
 #X connect 8 0 0 0;
