@@ -132,7 +132,7 @@ void confetti()
   // The led strip is divided into a fixed number of compartments containing some LEDs. 
   // Randomly a compartment starts fading in and out again. Randomness controllable by gRotary1
   // Color of compartment can be choosen with xyPad1 and xyPad2
-  const uint8_t cCompartments=10;
+  const uint8_t cCompartments=NUM_LEDS;
   const uint8_t cCompartmentLength=NUM_LEDS/cCompartments;
   const uint8_t cFadeAmmount=10;
   static uint8_t lValueOfCompartment[cCompartments];
