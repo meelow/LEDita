@@ -185,9 +185,11 @@ void tuneup()
   {
     leds[i] = CRGB(0,0,0);
   }
-  for( uint8_t i=0; i<(NUM_LEDS/120)*gRotary1; i++ )
+  uint8_t pixelsToLightUp=(NUM_LEDS/120)*gRotary1;
+  pixelsToLightUp += beatsin8(62,0,20);
+  for( uint8_t i=0; i<pixelsToLightUp; i++ )
   {
-    leds[i] = CHSV(gXYpad1,gXYpad2,gBrightness);
+    leds[i] = CHSV(gXYpad1,255,gBrightness);
   }
 }
 
