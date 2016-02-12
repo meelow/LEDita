@@ -11,10 +11,13 @@
 -1 -1 4;
 #X msg 252 134 send /1/fps \$1;
 #X msg 262 201 send /1/state/\$1/1 1;
-#X msg 8 16 connect 192.168.1.107 8000;
-#X obj 264 254 hsl 128 30 0 120 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 1600 1;
-#X msg 261 290 send /1/rotary1 \$1;
+#X obj 202 319 hsl 128 30 0 120 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 12700 1;
+#X msg 199 359 send /1/rotary1 \$1;
+#X msg 13 16 connect 192.168.1.199 8000;
+#X obj 279 253 bng 32 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 280 284 send /1/push1;
 #X connect 1 0 3 0;
 #X connect 1 0 0 0;
 #X connect 2 0 1 0;
@@ -25,7 +28,10 @@
 #X connect 7 0 3 0;
 #X connect 8 0 0 0;
 #X connect 8 0 3 0;
-#X connect 9 0 0 0;
-#X connect 10 0 11 0;
-#X connect 11 0 3 0;
+#X connect 9 0 10 0;
+#X connect 10 0 3 0;
+#X connect 10 0 0 0;
 #X connect 11 0 0 0;
+#X connect 12 0 13 0;
+#X connect 13 0 3 0;
+#X connect 13 0 0 0;
