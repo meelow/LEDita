@@ -9,43 +9,25 @@ FASTLED_USING_NAMESPACE
 #endif
 
 #define DATA_PIN    6
-//#define CLK_PIN   4
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS    120
-CRGB leds[NUM_LEDS];
 
-#define DEFAULT_FRAMES_PER_SECOND  60
+// helper macro:
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-CRGBPalette16 currentPalette;
+// global array of LED pixels for FastLED library:
+CRGB leds[NUM_LEDS];				
 
-void setup() {
-  delay(3000); // 3 second delay for recovery
-  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-
-  // set master brightness control
-  FastLED.setBrightness(128);
+// settings for default and current framerate: 
+const int DEFAULT_FRAMES_PER_SECOND=60;
+unsigned int gShowEveryNMillis = 1000/DEFAULT_FRAMES_PER_SECOND;
   
-  for(uint8_t i=0; i<255; i++)
-  {
-   fill_rainbow( leds, NUM_LEDS, i, 1);
-   FastLED.show();
-  }
-  
-  SetupChristmasPalette();
-  
-  Bridge.begin();
-  Console.begin();
-}
-
-
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-//SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
-//SimplePatternList gPatterns = { sinelon, confetti, barControl };
 SimplePatternList gModes = { confetti, rainbow, bpm, tuneup, sinelon, juggle };
-//SimplePatternList gPatterns = { barControl, rainbow };
 
+// global variables representing the input (get filled in updateFromBridge()):
 uint8_t gCurrentModeNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 uint8_t gBrightness=128;
@@ -56,9 +38,22 @@ uint8_t gPush1=0;
 uint8_t gPush2=0;
 uint8_t gPush3=0;
 
+void setup() {
+  delay(3000); // 3 second delay for recovery
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
-unsigned int gShowEveryNMillis = 1000/DEFAULT_FRAMES_PER_SECOND;
+  // Show boot-up animation:
+  FastLED.setBrightness(128);
+  for(uint8_t i=0; i<255; i++)
+  {
+   fill_rainbow( leds, NUM_LEDS, i, 1);
+   FastLED.show();
+  }
   
+  Bridge.begin();
+  Console.begin();
+}
+
 void loop()
 {
   unsigned long currentMillis = millis();
@@ -91,12 +86,85 @@ void loop()
   }
  }
 
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-
 void setMode(uint8_t number)
 {
   gCurrentModeNumber = (number) % ARRAY_SIZE( gModes);
   
+}
+
+void updateFromBridge()
+{
+	const uint8_t stringSize=3;
+	char bridgeValueStr[stringSize];
+	
+	// read brightness:
+	Bridge.get("brightness",bridgeValueStr, stringSize);
+	int brightness = atoi(bridgeValueStr);
+	if( brightness>0 && brightness<255 )
+	{
+	  gBrightness = brightness;
+	  Bridge.put("brightness","256");
+	} 
+
+	// read speed:
+	Bridge.get("fps", bridgeValueStr, stringSize);
+	int fps = atoi(bridgeValueStr);
+	if( fps==0 || fps<0 ) 
+	  fps=DEFAULT_FRAMES_PER_SECOND;
+    gShowEveryNMillis = 1000/fps;
+
+	// read mode:
+	Bridge.get("state",bridgeValueStr, stringSize);
+	int mode = atoi(bridgeValueStr);
+	if( mode>=0 && mode<255 )
+	{
+	  setMode(mode);
+	} 	
+	
+	// read rotary1:
+	Bridge.get("rotary1",bridgeValueStr, stringSize);
+	int rotary1 = atoi(bridgeValueStr);
+	if( rotary1>=0 && rotary1<255 )
+	{
+	  gRotary1=rotary1;
+	} 	
+
+	// read xypad:
+	Bridge.get("xypad1",bridgeValueStr, stringSize);
+	int xypad1 = atoi(bridgeValueStr);
+	if( xypad1>0 && xypad1<255 )
+	{
+	  gXYpad1 = xypad1;
+	} 
+	Bridge.get("xypad2",bridgeValueStr, stringSize);
+	int xypad2 = atoi(bridgeValueStr);
+	if( xypad2>0 && xypad2<255 )
+	{
+	  gXYpad2 = xypad2;
+	} 
+	
+	// read push buttons:
+	Bridge.get("push1",bridgeValueStr, stringSize);
+	int push1 = atoi(bridgeValueStr);
+	if( push1>0 && push1<256 )
+	{
+	  gPush1 = push1;
+	  Bridge.put("push1","0");
+	} 
+	Bridge.get("push2",bridgeValueStr, stringSize);
+	int push2 = atoi(bridgeValueStr);
+	if( push2>0 && push2<256 )
+	{
+	  gPush2 = push2;
+	  Bridge.put("push2","0");
+	} 
+	Bridge.get("push3",bridgeValueStr, stringSize);
+	int push3 = atoi(bridgeValueStr);
+	if( push3>0 && push3<=256 )
+	{
+	  gPush3 = push3;
+	  Bridge.put("push3","0");
+	} 
 }
 
 void rainbow() 
@@ -106,25 +174,6 @@ void rainbow()
   // static uint8_t lHue=0;
   // lHue+=1;
   // fill_rainbow( leds, NUM_LEDS, lHue, 1);
-}
-
-void rainbowWithGlitter() 
-{
-  // built-in FastLED rainbow, plus some random sparkly glitter
-  rainbow();
-  addGlitter(80);
-}
-
-void addGlitter( fract8 chanceOfGlitter) 
-{
-  if( random8() < chanceOfGlitter) {
-    uint8_t led = random16(NUM_LEDS);
-    leds[led-2] += CRGB::White;
-    leds[led-1] += CRGB::White;
-    leds[led] += CRGB::White;
-    leds[led+1] += CRGB::White;
-    leds[led+2] += CRGB::White;
-  }
 }
 
 void confetti() 
@@ -223,92 +272,3 @@ void juggle() {
   }
 }
 
-// This function sets up a palette of purple and green stripes.
-void SetupChristmasPalette()
-{
-    CRGB white = CRGB::White;
-    CRGB red  = CHSV( HUE_RED, 255, 255);
-	CRGB green = CRGB::Green;
-    CRGB black  = CRGB::Black;
-    
-    currentPalette = CRGBPalette16(
-                                   white,  white,  black,  black,
-                                   red, red, black,  black,
-                                   green,  green,  black,  black,
-                                   red, red, black,  black );
-}
-
-void updateFromBridge()
-{
-	const uint8_t stringSize=3;
-	char bridgeValueStr[stringSize];
-	
-	// read brightness:
-	Bridge.get("brightness",bridgeValueStr, stringSize);
-	int brightness = atoi(bridgeValueStr);
-	if( brightness>0 && brightness<255 )
-	{
-	  gBrightness = brightness;
-	  Bridge.put("brightness","256");
-	} 
-
-	// read speed:
-	Bridge.get("fps", bridgeValueStr, stringSize);
-	int fps = atoi(bridgeValueStr);
-	if( fps==0 || fps<0 ) 
-	  fps=DEFAULT_FRAMES_PER_SECOND;
-    gShowEveryNMillis = 1000/fps;
-
-	// read mode:
-	Bridge.get("state",bridgeValueStr, stringSize);
-	int mode = atoi(bridgeValueStr);
-	if( mode>=0 && mode<255 )
-	{
-	  setMode(mode);
-	} 	
-	
-	// read rotary1:
-	Bridge.get("rotary1",bridgeValueStr, stringSize);
-	int rotary1 = atoi(bridgeValueStr);
-	if( rotary1>=0 && rotary1<255 )
-	{
-	  gRotary1=rotary1;
-	} 	
-
-	// read xypad:
-	Bridge.get("xypad1",bridgeValueStr, stringSize);
-	int xypad1 = atoi(bridgeValueStr);
-	if( xypad1>0 && xypad1<255 )
-	{
-	  gXYpad1 = xypad1;
-	} 
-	Bridge.get("xypad2",bridgeValueStr, stringSize);
-	int xypad2 = atoi(bridgeValueStr);
-	if( xypad2>0 && xypad2<255 )
-	{
-	  gXYpad2 = xypad2;
-	} 
-	
-	// read push buttons:
-	Bridge.get("push1",bridgeValueStr, stringSize);
-	int push1 = atoi(bridgeValueStr);
-	if( push1>0 && push1<256 )
-	{
-	  gPush1 = push1;
-	  Bridge.put("push1","0");
-	} 
-	Bridge.get("push2",bridgeValueStr, stringSize);
-	int push2 = atoi(bridgeValueStr);
-	if( push2>0 && push2<256 )
-	{
-	  gPush2 = push2;
-	  Bridge.put("push2","0");
-	} 
-	Bridge.get("push3",bridgeValueStr, stringSize);
-	int push3 = atoi(bridgeValueStr);
-	if( push3>0 && push3<=256 )
-	{
-	  gPush3 = push3;
-	  Bridge.put("push3","0");
-	} 
-}
