@@ -1,37 +1,37 @@
-#N canvas 1126 -682 520 553 10;
+#N canvas 363 62 520 553 10;
 #X obj 8 272 sendOSC;
-#X msg 247 54 send /1/brightness \$1;
 #X obj 250 17 hsl 128 30 0 255 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 0;
+-1 -1 7400 0;
 #X obj 59 273 print;
 #X msg 36 35 disconnect;
 #X obj 255 97 hsl 128 30 0 255 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 2000 0;
+-1 -1 600 0;
 #X obj 262 168 hradio 30 1 0 7 empty empty empty 0 -8 0 30 -262144
--1 -1 4;
+-1 -1 2;
 #X msg 252 134 send /1/fps \$1;
 #X msg 262 201 send /1/state/\$1/1 1;
 #X obj 202 319 hsl 128 30 0 120 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 12700 1;
+-1 -1 0 1;
 #X msg 199 359 send /1/rotary1 \$1;
-#X msg 13 16 connect 192.168.1.199 8000;
 #X obj 279 253 bng 32 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X msg 280 284 send /1/push1;
-#X connect 1 0 3 0;
-#X connect 1 0 0 0;
-#X connect 2 0 1 0;
-#X connect 4 0 0 0;
+#X msg 13 16 connect 192.168.1.107 8000;
+#X msg 247 54 send /1/light \$1;
+#X connect 1 0 13 0;
+#X connect 3 0 0 0;
+#X connect 4 0 6 0;
 #X connect 5 0 7 0;
-#X connect 6 0 8 0;
+#X connect 6 0 0 0;
+#X connect 6 0 2 0;
 #X connect 7 0 0 0;
-#X connect 7 0 3 0;
-#X connect 8 0 0 0;
-#X connect 8 0 3 0;
-#X connect 9 0 10 0;
-#X connect 10 0 3 0;
-#X connect 10 0 0 0;
+#X connect 7 0 2 0;
+#X connect 8 0 9 0;
+#X connect 9 0 2 0;
+#X connect 9 0 0 0;
+#X connect 10 0 11 0;
+#X connect 11 0 2 0;
 #X connect 11 0 0 0;
-#X connect 12 0 13 0;
-#X connect 13 0 3 0;
+#X connect 12 0 0 0;
+#X connect 13 0 2 0;
 #X connect 13 0 0 0;
