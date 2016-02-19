@@ -23,9 +23,15 @@ OSC Packages:
   
 - /1/filters/<1-5>/1 <0-1>
   key: filters
+  NOT IMPLEMENTED on uC
   sets the filter <first-number> to on/off <second-number>.
   multiple filters can be on/off
 
+- /1/palette/<0-8>/1
+  key: palette
+  sets the current color palette (=color scheme)
+  used in palette animation and might be used in more animations
+  
 - /1/rotary1 <0-120>
   key: rotary1
   general rotary, often used for speed (60=normal) 
