@@ -25,11 +25,12 @@ unsigned int gShowEveryNMillis = 1000/DEFAULT_FRAMES_PER_SECOND;
   
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gModes = { confetti, rainbow, bpm, tuneup, sinelon, juggle };
+SimplePatternList gModes = { confetti, palette, bpm, tuneup, sinelon, juggle };
+
 
 // global variables representing the input (get filled in updateFromBridge()):
 uint8_t gCurrentModeNumber = 0; // Index number of which pattern is current
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+uint8_t gHue = 0; 				// rotating "base color" used by many of the patterns
 uint8_t gBrightness=128;
 uint8_t gRotary1=60;
 uint8_t gXYpad1=0;
@@ -37,6 +38,10 @@ uint8_t gXYpad2=0;
 uint8_t gPush1=0;
 uint8_t gPush2=0;
 uint8_t gPush3=0;
+
+// predefined color schemes used in some animations (e.g. palette() cycles through the color scheme)
+CRGBPalette16 currentPalette;     // changed by setCurrentPalette() in updateFromBridg()
+TBlendType    currentBlending;    // currently always LINEARBLEND
 
 void setup() {
   delay(3000); // 3 second delay for recovery
@@ -52,6 +57,9 @@ void setup() {
   
   Bridge.begin();
   Console.begin();
+  
+  currentPalette = RainbowColors_p;
+  currentBlending = LINEARBLEND;
 }
 
 void loop()
@@ -70,10 +78,10 @@ void loop()
     timeOfLastProcessing = currentMillis;  // remember this processing
   	gHue+=1;
 	
-	// boost speed a little so that rainbow looks faster:
-	if( gShowEveryNMillis<10) gHue+=2;
-	
-	// fill the 'led' buffer:
+    // boost speed a little so that rainbow looks faster:
+    if( gShowEveryNMillis<10) gHue+=2;
+
+    // fill the 'led' buffer:
     gModes[gCurrentModeNumber]();
   }
   
@@ -91,6 +99,47 @@ void setMode(uint8_t number)
   gCurrentModeNumber = (number) % ARRAY_SIZE( gModes);
   
 }
+
+void setCurrentPalette(uint8_t index)
+{
+  // changing the current palette
+  switch(index)
+  {
+    case 0:
+      currentPalette = RainbowColors_p;
+      break;
+    case 1:
+      currentPalette = RainbowStripeColors_p;
+      break;
+    case 2:
+      currentPalette = CloudColors_p;
+      break;
+    case 3:
+      currentPalette = PartyColors_p;
+      break;
+    case 4:
+      currentPalette = HeatColors_p ;
+      break;
+    case 5:
+      currentPalette = ForestColors_p ;
+      break;
+    case 6:
+      currentPalette = OceanColors_p ;
+      break;
+    case 7:
+      currentPalette = LavaColors_p ;
+      break;
+    case 8:
+      currentPalette = HeatColors_p  ;
+      break;
+    case 9:
+      currentPalette = Rainbow_gp;
+    default:
+      currentPalette = RainbowColors_p;
+      break;
+  }
+}
+
 
 void updateFromBridge()
 {
@@ -120,6 +169,15 @@ void updateFromBridge()
 	{
 	  setMode(mode);
 	} 	
+  
+  // read palette index:
+  Bridge.get("palette", bridgeValueStr, stringSize);
+	int palette = atoi(bridgeValueStr);
+	if( palette>=0 && palette<255 )
+	{
+	  setCurrentPalette(palette);
+	} 	
+  
 	
 	// read rotary1:
 	Bridge.get("rotary1",bridgeValueStr, stringSize);
@@ -167,14 +225,15 @@ void updateFromBridge()
 	} 
 }
 
-void rainbow() 
+
+void palette()
 {
-  // FastLED's built-in rainbow generator
-  fill_rainbow( leds, NUM_LEDS, gHue, 1);
-  // static uint8_t lHue=0;
-  // lHue+=1;
-  // fill_rainbow( leds, NUM_LEDS, lHue, 1);
+  //setCurrentPalette(map( gRotary1, 0, 120, 0, 9));
+	for( int i = 0; i < NUM_LEDS; i++) {
+		leds[i] = ColorFromPalette( currentPalette, gHue+i, 255, currentBlending);
+	}
 }
+
 
 void confetti() 
 {

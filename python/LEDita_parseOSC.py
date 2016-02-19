@@ -64,29 +64,25 @@ def multiselectState_callback(path, tags, args, source):
 		msg.insert(0, 1)
 		client.connect( (source[0], 9000) )
 		client.send(msg)
-for x in range(0,7):
+for x in range(0,20):
 	server.addMsgHandler("/1/state/"+str(x)+"/1", multiselectState_callback)
 
-activeFilters=0
-def multiselectFilters_callback(path, tags, args, source):
-	global activeFilters;
+def multiselectPalette_callback(path, tags, args, source):
+	print "received: " +repr(source)+ " " + str(path) 
 	split = path.split("/")
-	filter = split.pop()
-	filter = split.pop()
-	print str(path) + " " + str(args[0]) + "   filter=" + str(filter)
-#	if args[0]==1:
+	Palette = split.pop()
+	Palette = split.pop()
+	if args[0]==1:
 		#requests.get("http://192.168.1.104/arduino/state/"+str(int(state)-1))
-	filtersToToggle = (1<<(int(filter)-1))
-	activeFilters = activeFilters ^ filtersToToggle
-	print "Received "+ str(filtersToToggle) + "=> activeFilters= " + str(activeFilters)
-	json.send({'command':'put', 'key':'filters', 'value':'%i' % int(activeFilters)})
-	msg = OSCMessage(path)
-	msg.insert(0, int(args[0]))
-	client.connect( (source[0], 9000) )
-	client.send(msg)
-for x in range(1,5):
-	server.addMsgHandler("/1/filters/"+str(x)+"/1", multiselectFilters_callback)
+		json.send({'command':'put', 'key':'palette', 'value':'%i' % int(int(Palette)-1)})
+		msg = OSCMessage(path)
+		msg.insert(0, 1)
+		client.connect( (source[0], 9000) )
+		client.send(msg)
+for x in range(0,20):
+	server.addMsgHandler("/1/palette/"+str(x)+"/1", multiselectPalette_callback)
 
+  
 def rotary1_callback(path, tags, args, source):
 	print str(path) + " " + str(args[0])
 	json.send({'command':'put', 'key':'rotary1', 'value':'%i' % int(args[0])})
