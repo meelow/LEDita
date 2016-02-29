@@ -293,11 +293,23 @@ void tuneup()
   {
     leds[i] = CRGB(0,0,0);
   }
+  
+  // light up some pixels always:
   uint8_t pixelsToLightUp=(NUM_LEDS/120)*gRotary1;
-  pixelsToLightUp += beatsin8(62,0,20);
+  
+  // the speed of the sine wave:
+  const uint8_t bpm=map(gXYpad1,0,255,30,120);
+  
+  // the legth of the led stripe that will react to the beet:
+  const uint8_t numberOfPixelsToBeat = map(gXYpad2,0,255,NUM_LEDS/2,0);
+  pixelsToLightUp += beatsin8(bpm,0,numberOfPixelsToBeat);
+  
+  // light up all pixels that should be light
   for( uint8_t i=0; i<pixelsToLightUp; i++ )
   {
-    leds[i] = CHSV(gXYpad1,255,gBrightness);
+	// spread out the whole palette of the light up pixels:
+    uint8_t paletteIndex = map( i, 0, pixelsToLightUp, 0, 256);
+	leds[i] = ColorFromPalette( currentPalette, paletteIndex, gBrightness );
   }
 }
 
@@ -317,7 +329,7 @@ void bpm()
   CRGBPalette16 palette = PartyColors_p;
   uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
   for( int i = 0; i < NUM_LEDS; i++) { //9948
-    leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
+    leds[i] = ColorFromPalette(currentPalette, gHue+(i*2), beat-gHue+(i*10));
   }
 }
 
