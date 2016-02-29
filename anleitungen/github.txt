@@ -1,0 +1,22 @@
+Forken+updaten (mit installierter git bash)
+
+1) fork: über github homepage
+
+2) clone:
+git clone https://github.com/Michadelic/LEDita.git
+
+3)
+git remote add upstream https://github.com/meelow/LEDita
+git fetch upstream
+git checkout master
+git rebase upstream/master
+git push -f origin master
+
+4)
+git add .
+git commit -m "ich hab da was gemacht"
+Nachricht eingeben
+git push
+Zugangsdaten eingeben
+
+5) Pull request anlegen: über github homepage
