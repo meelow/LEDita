@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>LEDita control pad</title>
+		<meta charset="UTF-8" />
+		<!-- init bower dependencies -->
+		<script src="bower_components/jquery/jquery.js"></script>
+		<script src="bower_components/osc.js/dist/osc-browser.min.js"></script>
+		<link rel="stylesheet" href="bower_components/pure/base-min.css" type="text/css" />
+		<link rel="stylesheet" href="bower_components/pure/grids-min.css" type="text/css" />
+		<link rel="stylesheet" href="bower_components/pure/forms-min.css" type="text/css" />
+		<!-- init jQuery UI -->
+		<script src="jquery/jquery-ui.js"></script>
+		<link rel="stylesheet" type="text/css" media="all" href="jquery/jquery-ui.css"></link>
+		<!-- init plugins -->
+		<script type="text/javascript" src="jquery/farbtastic.js"></script>
+		<link rel="stylesheet" href="jquery/farbtastic.css" type="text/css" />
+		<script type="text/javascript" src="jquery/jquery.knob.js"></script>
+		<script type="text/javascript" src="jquery/jquery.kontrol.js"></script>
+		<!-- init project files -->
+		<link rel="stylesheet" href="styles.css" type="text/css" />
+		<!-- start connection to server -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$.farbtastic("#colorpicker", {width: 300}).linkTo(oLEDita.handleColorChange);
+			});
+
+			function LEDita () {
+				this._messageCount = 0;
+				// create web socket connection to server
+				this.port = port = new osc.WebSocketPort({
+					url: "ws://localhost:8081"
+				});
+				this.port.open();
+				$.when($.ready).then(function() {
+					$("#connectionInfo").html("connected");
+					oLEDita.debug("Connected to server with url ws://localhost:8081");
+				});
+
+				this.sendMessage = function (oConfig, bNoDelay) {
+					this.debug("sending message " + JSON.stringify(oConfig));
+					$("#connectionInfo").html(++this._messageCount + " messages sent");
+					if (true) {
+						this.port.send(oConfig);
+						return;
+					}
+					clearTimeout(this._timer);
+					this._timer = setTimeout(function () {
+						this.port.send(oConfig);
+					}, 500);
+				};
+
+				this.debug = function (sMessage, iType) {
+					$("#debugOutput").append(sMessage + "\n<br>");
+					$("#debug").stop();
+					$("#debug").animate({ scrollTop: $("#debugOutput").height() }, "slow");
+				}
+
+				this.handleFPSChange = function (event, ui) {
+					this.sendMessage({
+						address: "/1/fps",
+						args: ui.value
+					});
+					$("#sliderFPSAmount").html(ui.value);
+				};
+
+				this.handleBrightnessChange = function (event, ui) {
+					this.sendMessage({
+						address: "/1/light",
+						args: ui.value
+					});
+					$("#sliderBrightnessAmount").html(ui.value);
+				};
+
+				this.handleStateChange = function (value) {
+					this.sendMessage({
+						address: "/1/state/" + value + "/1",
+						args: [1]
+					}, true);
+				};
+
+				this.handlePaletteChange = function (value) {
+					this.sendMessage({
+						address: "/1/palette/" + value + "/1",
+						args: [1]
+					}, true);
+				};
+
+				this.handlePushButton = function () {
+					this.sendMessage({
+						address: "/1/push1",
+						args: [1]
+					});
+				}
+
+				this.handleDialChange = function (value) {
+					this.sendMessage({
+						address: "/1/rotary1",
+						args: value
+					});
+				};
+
+				this.handleXYChange = function (value) {
+					this.sendMessage({
+						address: "/1/xypad",
+						args: [value.x, value.y]
+					});
+				};
+
+				this.handleColorChange = function (value) {
+					// TODO
+					oLEDita.debug("not implemented yet, new color value: " + value)
+				}
+				return this;
+			};
+
+			var oLEDita = new LEDita();
+
+		</script>
+	</head>
+
+	<body>
+		<div class="header">
+			<div id="connectionInfo">connecting...</div>
+			<h1>LEDita.control.pad</h1>
+		</div>
+
+		<div class="pure-g">
+			<div class="pure-u-1-2">
+				<div>
+					<form class="pure-form pure-form-aligned">
+						<fieldset>
+							<label for="sliderFPS">FPS</label>
+							<span id="sliderFPSAmount" class="sliderValue">0</span>
+							<div id="sliderFPS"></div>
+							<label for="sliderBrightness">Brightness</label>
+							<span id="sliderBrightnessAmount" class="sliderValue">0</span>
+							<div id="sliderBrightness"></div>
+							<br>
+							<label for="styleset">Style</label>
+							<form>
+								<div id="styleset">
+									<input type="radio" id="style1" name="radio" checked="checked"><label for="style1">Flash</label>
+									<input type="radio" id="style2" name="radio"><label for="style2">Rainbow</label>
+									<input type="radio" id="style3" name="radio"><label for="style3">Snakes</label>
+									<input type="radio" id="style4" name="radio"><label for="style4">Runner</label>
+									<input type="radio" id="style5" name="radio"><label for="style5">Wild</label>
+									<input type="radio" id="style6" name="radio"><label for="style6">Blink</label>
+									<!--<input type="radio" id="style7" name="radio"><label for="style7">7</label>-->
+									<!--<input type="radio" id="style8" name="radio"><label for="style8">8</label>-->
+									<!--<input type="radio" id="style9" name="radio"><label for="style9">9</label>-->
+									<!--<input type="radio" id="style10" name="radio"><label for="style10">10</label>-->
+								</div>
+							</form>
+						</fieldset>
+
+						<label for="paletteset">Palette</label>
+						<form>
+							<div id="paletteset">
+								<input type="radio" id="palette1" name="radio" checked="checked"><label for="palette1">1</label>
+								<input type="radio" id="palette2" name="radio"><label for="palette2">2</label>
+								<input type="radio" id="palette3" name="radio"><label for="palette3">3</label>
+								<input type="radio" id="palette4" name="radio"><label for="palette4">4</label>
+								<input type="radio" id="palette5" name="radio"><label for="palette5">5</label>
+								<input type="radio" id="palette6" name="radio"><label for="palette6">6</label>
+								<input type="radio" id="palette7" name="radio"><label for="palette7">7</label>
+								<input type="radio" id="palette8" name="radio"><label for="palette8">8</label>
+							</div>
+						</form>
+					</fieldset>
+					</form>
+
+					<br>
+					<button id="push">Push</button>
+				</div>
+			</div>
+			<div class="pure-u-1-2">
+				<div>
+						<label for="sliderStyle">Dial</label><br>
+						<input type="text" id="dial" name="dial" value="0" />
+						<br>
+						<label for="sliderStyle">XY</label><br>
+						<input class="xypad" value='{"x": 50, "y": 50}'>
+						<form class="pure-form pure-form-aligned">
+							<fieldset>
+								<label for="sliderStyle">Color</label>
+								<input type="text" id="color" name="color" value="#123456" />
+								<div id="colorpicker"></div>
+							</fieldset>
+						</form>
+				</div>
+			</div>
+		</div>
+
+		<span id="debugLabel">Console</span>
+		<div id="debug">
+			<div id="debugOutput"></div>
+		</div>
+
+	<script>
+			$("#sliderFPS").slider({
+				value: 2,
+				min: 0,
+				max: 255,
+				slide: oLEDita.handleFPSChange.bind(oLEDita)
+			});
+			$("#sliderBrightness").slider({
+				value: 2,
+				min: 0,
+				max: 255,
+				slide: oLEDita.handleBrightnessChange.bind(oLEDita)
+			});
+
+			$("#styleset").buttonset();
+			$("#styleset input[type=radio]").change(function () {
+				oLEDita.handleStateChange(this.id.replace("style", ""));
+			});
+
+			$("#paletteset").buttonset();
+			$("#paletteset input[type=radio]").change(function () {
+				oLEDita.handlePaletteChange(this.id.replace("palette", ""));
+			});
+
+			$("#push").button().click(oLEDita.handlePushButton.bind(oLEDita));
+
+			$("#dial").knob({
+				thickness: 0.2,
+				lineCap: "round",
+				width: 185,
+				height: 185,
+				fgColor: "#f58400",
+				inputColor: "#f58400",
+				change: oLEDita.handleDialChange.bind(oLEDita)
+			});
+
+$(function() {
+			 $('.xypad').xy({
+				 displayPrevious: true,
+				 min: 0,
+				 max: 255,
+				 width: 185,
+				 height: 185,
+				 displayInput: false,
+				 fgColor:"#f58400",
+				 bgColor:"#EEEEEE",
+				 change: oLEDita.handleXYChange.bind(oLEDita)
+			 }).css({'border':'5px solid #DDD'});
+});
+			</script>
+	</body>
+</html>

@@ -305,6 +305,13 @@ void tuneup()
   pixelsToLightUp += beatsin8(bpm,0,numberOfPixelsToBeat);
   
   // light up all pixels that should be light
+   const uint8_t cFadeAmmount=50;
+   fadeToBlackBy( leds, NUM_LEDS, cFadeAmmount);
+  
+  // display some pixels permanently, controlled by gRotary1=[0..120]
+  uint8_t pixelsToLightUp=(NUM_LEDS/120)*gRotary1;
+  if( pixelsToLightUp>NUM_LEDS ) 
+    pixelsToLightUp=NUM_LEDS;
   for( uint8_t i=0; i<pixelsToLightUp; i++ )
   {
 	// spread out the whole palette of the light up pixels:
