@@ -8,7 +8,8 @@ import types
 server = OSCServer( ("192.168.1.250", 10000) )
 
 # list of clients to relay the messages to:
-clients = [[OSCClient(), ("192.168.1.105", 8000)],
+clients = [[OSCClient(), ("192.168.1.104", 8000)],
+		   [OSCClient(), ("192.168.1.105", 8000)],
 		   [OSCClient(), ("192.168.1.107", 8000)], 
 		   [OSCClient(), ("192.168.1.199", 8000)]
 		  ]
@@ -32,7 +33,7 @@ def relayMessageCallback(path, tags, args, source):
 #	print "source="+str(source)
 	for client in clients:
 		msg = OSCMessage(path)
-		msg.insert(0, args[0])
+		msg.extend(args)
 		client[0].send(msg)
 		print "relaying to " + str(client[1]) + " : " + str(msg)
 		
