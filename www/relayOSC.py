@@ -3,15 +3,19 @@ import sys
 from time import sleep
 import types
 
+# get to know my own ip adress:
+from tools import get_ip
 													 
 #set up the OSC server to listen for the UI device 
-server = OSCServer( ("192.168.1.250", 10000) )
+server = OSCServer( (get_ip("wlan0"), 10000) )
 
 # list of clients to relay the messages to:
-clients = [[OSCClient(), ("192.168.1.104", 8000)],
+clients = [
+#		   [OSCClient(), ("192.168.1.104", 8000)],
 		   [OSCClient(), ("192.168.1.105", 8000)],
-		   [OSCClient(), ("192.168.1.107", 8000)], 
-		   [OSCClient(), ("192.168.1.199", 8000)]
+		   [OSCClient(), ("192.168.1.107", 8000)]
+		   #, 
+#		   [OSCClient(), ("192.168.1.199", 8000)]
 		  ]
 for client in clients:
 	client[0].connect( client[1] )

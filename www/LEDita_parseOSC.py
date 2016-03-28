@@ -6,23 +6,16 @@ sys.path.insert(0, '/usr/lib/python2.7/bridge/') # make sure python can see the 
 
 from tcp import TCPJSONClient
 
-# for finding our own ip adress:
-import socket
-import fcntl
-import struct
-def get_ip(interface):
-  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', interface[:15]))[20:24])
-
-													 
+# use this to get the ip of the current wlan interface
+from tools import get_ip
+										 
 #set up the json client and the osc client and server. The server should have the ip of your Yun. 
 #The client.connect should have the ip address of you phone. 
 json = TCPJSONClient('127.0.0.1', 5700)
 server = OSCServer( (get_ip("wlan0"), 8000) )
 client = OSCClient()
-#client.connect( ("192.168.1.142", 9000) )
 
-#waits for slider change
+#waits for data
 def handle_timeout(self):
 	print ("Awaiting data...")
 
