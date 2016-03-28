@@ -24,7 +24,7 @@ client = OSCClient()
 
 #waits for slider change
 def handle_timeout(self):
-	print ("Timeout")
+	print ("Awaiting data...")
 
 server.handle_timeout = types.MethodType(handle_timeout, server)
 

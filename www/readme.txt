@@ -1,11 +1,19 @@
 This python script are run on the ARM side of the Yun.
-It implements a OSC Server that will accept following OSC packages.
-The yun keystore (http://your-yun/keystore_manager_example/ will keep the values under the described key.
+
+Directory content:
+- relayOSC.py:
+  implements a OSC server which listens on wlan0-ip on port 10000 and will relay all messages to 
+  other OSC servers on port 8000 (where LEDita_parseOSC listens)
+  
+- LEDita_parseOSC.py:
+  implements a OSC Server which listens wlan0-ip on port 8000 and will accept following OSC packages.
+  The yun keystore (http://your-yun/keystore_manager_example/ will keep the values under the described key.
 
 Prerequisites:
 - Install pyosc (python-pyosc) by going to the Yun config page and clicking 'configure -> advanced -> system -> software -> Available packages'
+- Install external sd card (LEDita_parseOSC.py is on SD card and arduino-editor will automatically upload it)
 - autorun on yun startup by adding following line before "exit 0" in 'configure -> advanced -> system -> Startup -> Local Startup"
-  (sleep 10;python /root/LEDita_parseOSC.py)&
+  (sleep 10;python /www/sd/arduino/www/LEDita_parseOSC.py)&
 
 OSC Packages:
 - /1/light/<0-255>
