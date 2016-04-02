@@ -1,0 +1,139 @@
+<OSCseq>
+<sequence bpm="120.0" windowwidth="634" windowheight="600" loopin="0.0" loopout="16.0" loopon="true" cursorpos="13.116315324" stepsize="1.0" displaybounds_left="0.0" displaybounds_top="-2.5" displaybounds_right="3.0" displaybounds_bottom="24.2" selection_left="1.0" selection_top="-2.5" selection_right="2.0" selection_bottom="-2.25" version="6" drawEventText="true">
+	<devices>
+		<device name="-manual-" ip="192.168.1.107" port="8000" selected="true" manual="true" sendSystemMessages="false"></device>
+		<device name="-manual-" ip="192.168.1.105" port="8000" selected="true" manual="true" sendSystemMessages="false"></device>
+	</devices>
+	<tracks>
+		<track id="3" collapsed="true" muted="false" recording="true" pos="0" type="CONTROLLER" doInputFilter="true" address="/1/light">
+			<event beat="0.0" color="FF000000" selected="false">
+				<atom type="INT" value="50"></atom>
+			</event>
+			<event beat="1.0" color="FF000000" selected="false">
+				<atom type="INT" value="60"></atom>
+			</event>
+			<event beat="2.0" color="FF000000" selected="false">
+				<atom type="INT" value="70"></atom>
+			</event>
+			<event beat="3.0" color="FF000000" selected="false">
+				<atom type="INT" value="80"></atom>
+			</event>
+			<event beat="4.0" color="FF000000" selected="false">
+				<atom type="INT" value="90"></atom>
+			</event>
+			<event beat="5.0" color="FF000000" selected="false">
+				<atom type="INT" value="100"></atom>
+			</event>
+			<event beat="6.0" color="FF000000" selected="false">
+				<atom type="INT" value="120"></atom>
+			</event>
+			<event beat="7.0" color="FF000000" selected="false">
+				<atom type="INT" value="130"></atom>
+			</event>
+			<event beat="8.0" color="FF000000" selected="false">
+				<atom type="INT" value="140"></atom>
+			</event>
+			<event beat="9.0" color="FF000000" selected="false">
+				<atom type="INT" value="160"></atom>
+			</event>
+			<event beat="10.0" color="FF000000" selected="false">
+				<atom type="INT" value="180"></atom>
+			</event>
+			<event beat="11.0" color="FF000000" selected="false">
+				<atom type="INT" value="200"></atom>
+			</event>
+			<event beat="12.0" color="FF000000" selected="false">
+				<atom type="INT" value="150"></atom>
+			</event>
+			<event beat="13.0" color="FF000000" selected="false">
+				<atom type="INT" value="100"></atom>
+			</event>
+			<event beat="14.0" color="FF000000" selected="false">
+				<atom type="INT" value="50"></atom>
+			</event>
+		</track>
+		<track id="2" collapsed="true" muted="false" recording="true" pos="1" type="CONTROLLER" doInputFilter="true" address="/1/fps">
+			<event beat="0.02499999999999991" color="FF000000" selected="false">
+				<atom type="FLOAT" value="120.0"></atom>
+			</event>
+			<event beat="1.0" color="FF000000" selected="false">
+				<atom type="INT" value="110"></atom>
+			</event>
+			<event beat="2.0" color="FF000000" selected="false">
+				<atom type="INT" value="100"></atom>
+			</event>
+			<event beat="3.0" color="FF000000" selected="false">
+				<atom type="INT" value="90"></atom>
+			</event>
+			<event beat="4.0" color="FF000000" selected="false">
+				<atom type="INT" value="80"></atom>
+			</event>
+			<event beat="5.0" color="FF000000" selected="false">
+				<atom type="INT" value="70"></atom>
+			</event>
+			<event beat="6.0" color="FF000000" selected="false">
+				<atom type="INT" value="60"></atom>
+			</event>
+			<event beat="7.0" color="FF000000" selected="false">
+				<atom type="INT" value="50"></atom>
+			</event>
+			<event beat="12.0" color="FF000000" selected="false">
+				<atom type="INT" value="70"></atom>
+			</event>
+			<event beat="13.0" color="FF000000" selected="false">
+				<atom type="INT" value="90"></atom>
+			</event>
+			<event beat="14.0" color="FF000000" selected="false">
+				<atom type="INT" value="120"></atom>
+			</event>
+		</track>
+		<track id="1" collapsed="true" muted="false" recording="true" pos="2" type="CONTROLLER" doInputFilter="true" address="/1/rotary1">
+			<event beat="0.050000000000000044" color="FF000000" selected="false">
+				<atom type="FLOAT" value="1.0"></atom>
+			</event>
+			<event beat="1.0" color="FF000000" selected="false">
+				<atom type="INT" value="10"></atom>
+			</event>
+			<event beat="2.0" color="FF000000" selected="false">
+				<atom type="INT" value="20"></atom>
+			</event>
+			<event beat="3.0" color="FF000000" selected="false">
+				<atom type="INT" value="40"></atom>
+			</event>
+			<event beat="4.0" color="FF000000" selected="false">
+				<atom type="INT" value="50"></atom>
+			</event>
+			<event beat="5.0" color="FF000000" selected="false">
+				<atom type="INT" value="60"></atom>
+			</event>
+			<event beat="6.0" color="FF000000" selected="false">
+				<atom type="INT" value="70"></atom>
+			</event>
+			<event beat="7.0" color="FF000000" selected="false">
+				<atom type="INT" value="80"></atom>
+			</event>
+			<event beat="8.0" color="FF000000" selected="false">
+				<atom type="INT" value="90"></atom>
+			</event>
+			<event beat="9.0" color="FF000000" selected="false">
+				<atom type="INT" value="100"></atom>
+			</event>
+			<event beat="10.0" color="FF000000" selected="false">
+				<atom type="INT" value="110"></atom>
+			</event>
+			<event beat="11.0" color="FF000000" selected="false">
+				<atom type="INT" value="120"></atom>
+			</event>
+			<event beat="12.0" color="FF000000" selected="false">
+				<atom type="INT" value="60"></atom>
+			</event>
+			<event beat="13.0" color="FF000000" selected="false">
+				<atom type="INT" value="30"></atom>
+			</event>
+			<event beat="14.0" color="FF000000" selected="false">
+				<atom type="INT" value="1"></atom>
+			</event>
+		</track>
+	</tracks>
+</sequence>
+</OSCseq>

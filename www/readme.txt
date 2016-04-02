@@ -13,7 +13,7 @@ Prerequisites:
 - Install pyosc (python-pyosc) by going to the Yun config page and clicking 'configure -> advanced -> system -> software -> Available packages'
 - Install external sd card (LEDita_parseOSC.py is on SD card and arduino-editor will automatically upload it)
 - autorun on yun startup by adding following line before "exit 0" in 'configure -> advanced -> system -> Startup -> Local Startup"
-  (sleep 10;python /www/sd/LEDita_parseOSC.py)&
+  (sleep 10;python /www/sd/LEDita/LEDita_parseOSC.py)&
 
 OSC Packages:
 - /1/light/<0-255>
