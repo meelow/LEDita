@@ -11,7 +11,7 @@ FASTLED_USING_NAMESPACE
 #define DATA_PIN    6
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
-#define NUM_LEDS    120
+#define NUM_LEDS    240
 
 // helper macro:
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
@@ -62,10 +62,13 @@ void setup() {
   currentBlending = LINEARBLEND;
 }
 
+
 void loop()
 {
   unsigned long currentMillis = millis();
   static unsigned long timeOfLastProcessing=0;
+  
+  static unsigned long push_button=0;
   
   // Input
   //  read OSC data from bridge and adapt these input values
@@ -89,7 +92,15 @@ void loop()
   //  adapt current brightness and paint the buffer 'leds' on the string
   EVERY_N_MILLISECONDS(10) 
   { 
-    FastLED.setBrightness(gBrightness);
+    if( gPush1>0) 
+	{
+	  gPush1 = qsub8(gPush1, 8);
+      FastLED.setBrightness( qadd8(gBrightness, flashInAndOutBrightness(gPush1)) );
+	}
+	else
+	{
+	  FastLED.setBrightness( gBrightness);
+	}  
     FastLED.show();  
   }
  }
@@ -341,5 +352,27 @@ void juggle() {
     leds[beatsin16(i+7,0,NUM_LEDS)] |= CHSV(dothue, 200, 255);
     dothue += 32;
   }
+}
+
+/* a function that computes the f(x) for something like
+ f(x)
+  255|
+	 |    /\
+	 |  /      \
+  0	 |/             \
+     +-------------------- x
+	255  200    100     0
+	 */
+uint8_t flashInAndOutBrightness(uint8_t x)
+{
+  uint8_t result=0;
+  if( x > 200)  
+    result = (255-x)*4.8;
+  else
+    result = 1.275*x;
+  // Console.print(x);
+  // Console.print(" -> ");
+  // Console.println(result);
+  return result;
 }
 
