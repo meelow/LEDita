@@ -12,9 +12,14 @@ server = OSCServer( (get_ip("wlan0"), 10000) )
 
 # list of clients to relay the messages to:
 clients = [
-		   [OSCClient(), ("192.168.1.104", 8000)],
-		   [OSCClient(), ("192.168.1.107", 8000)],
-		   [OSCClient(), ("192.168.1.199", 8000)]
+		   # [OSCClient(), ("192.168.1.104", 8000)],
+		   # [OSCClient(), ("192.168.1.107", 8000)],
+		   # [OSCClient(), ("192.168.1.199", 8000)]
+   		   [OSCClient(), ("192.168.1.108", 8000)], # qualle
+		   [OSCClient(), ("192.168.1.199", 8000)], # Ledita4
+		   [OSCClient(), ("192.168.1.104", 8000)],  # Ledita6 
+		   [OSCClient(), ("192.168.1.107", 8000)]  # Ledita6 
+
 		   #, 
 #		   [OSCClient(), ("192.168.1.199", 8000)]
 		  ]

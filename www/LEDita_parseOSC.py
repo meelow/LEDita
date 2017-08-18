@@ -106,18 +106,21 @@ def accell_callback(path, tags, args, source):
 server.addMsgHandler("/accxyz/", accell_callback)
 
 def push1_callback(path, tags, args, source):
-	print str(path) 
-	json.send({'command':'put', 'key':'push1', 'value':'255' })
+	print str(path) + " args=" + str(args);
+	if args[0]==1:
+		json.send({'command':'put', 'key':'push1', 'value':'255' })
 server.addMsgHandler("/1/push1/", push1_callback)
 
 def push2_callback(path, tags, args, source):
-	print str(path) 
-	json.send({'command':'put', 'key':'push2', 'value':'255' })
+	print str(path) + " args=" + str(args);
+	if args[0]==1:
+		json.send({'command':'put', 'key':'push2', 'value':'255' })
 server.addMsgHandler("/1/push2/", push2_callback)
 
 def push3_callback(path, tags, args, source):
-	print str(path) 
-	json.send({'command':'put', 'key':'push3', 'value':'255' })
+	print str(path) + " args=" + str(args);
+	if args[0]==1:
+		json.send({'command':'put', 'key':'push3', 'value':'255' })
 server.addMsgHandler("/1/push3/", push3_callback)
 
 while True:
