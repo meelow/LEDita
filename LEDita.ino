@@ -1,6 +1,7 @@
 #include "FastLED.h"
 #include <Bridge.h>
 #include <Console.h>
+#include <Bounce2.h>
 
 FASTLED_USING_NAMESPACE
 
@@ -13,11 +14,22 @@ FASTLED_USING_NAMESPACE
 #define COLOR_ORDER GRB
 #define NUM_LEDS    300
 
+// for buttons:
+#define BUTTON_PIN_1 2
+#define BUTTON_PIN_2 4
+#define LED_PIN 13
+
 // helper macro:
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 // global array of LED pixels for FastLED library:
 CRGB leds[NUM_LEDS];                
+
+// for buttons:
+// Instantiate a Bounce object
+Bounce button1 = Bounce(); 
+Bounce button2 = Bounce(); 
+
 
 // settings for default and current framerate: 
 const int DEFAULT_FRAMES_PER_SECOND=60;
@@ -49,7 +61,18 @@ uint8_t gPush3=0;
 CRGBPalette16 currentPalette;     // changed by setCurrentPalette() in updateFromBridg()
 TBlendType    currentBlending;    // currently always LINEARBLEND
 
-void setup() {
+void setup() 
+{
+  // Setup both buttons with an internal pull-up :
+  pinMode(BUTTON_PIN_1,INPUT_PULLUP);
+  button1.attach(BUTTON_PIN_1);
+  button1.interval(5); // interval in ms
+  pinMode(BUTTON_PIN_2,INPUT_PULLUP);
+  button2.attach(BUTTON_PIN_2);
+  button2.interval(5); // interval in ms
+  //Setup the LED :
+  pinMode(LED_PIN,OUTPUT);
+  
   delay(3000); // 3 second delay for recovery
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
@@ -79,7 +102,28 @@ void loop()
   // Input
   //  read OSC data from bridge and adapt these input values
   EVERY_N_MILLISECONDS(100) { updateFromBridge(); }
-  
+   
+  // Update the Bounce instances :
+  button1.update();
+  button2.update();
+  // Turn on the LED if either button is pressed :
+  if( button1.fell() )
+  {
+    setMode(3);	
+    digitalWrite(LED_PIN, HIGH );
+  }
+  if( button2.fell() )
+  {
+    setMode(1);	
+    digitalWrite(LED_PIN, LOW );
+  }  
+  if ( button1.read() == LOW || button2.read() == LOW ) {
+    digitalWrite(LED_PIN, HIGH );
+  } 
+  else {
+    digitalWrite(LED_PIN, LOW );
+  }
+
   // Processing
   //  do computation on the global variables and input values then paint into the buffer 'leds'
   if( (currentMillis-timeOfLastProcessing) > gShowEveryNMillis )  
@@ -193,9 +237,9 @@ void updateFromBridge()
     // read mode:
     Bridge.get("state",bridgeValueStr, stringSize);
     int mode = atoi(bridgeValueStr);
-    if( mode>=0 && mode<255 )
+    if( mode>0 && mode<255 )
     {
-      setMode(mode);
+      setMode(mode-1);
     }     
   
   // read palette index:
