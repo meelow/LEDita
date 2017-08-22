@@ -1,0 +1,3 @@
+#!/bin/bash
+scp ../../.pioenvs/yun/firmware.hex root@192.168.240.1:/root/firmware.hex
+
